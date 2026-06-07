@@ -1,16 +1,51 @@
-# React + Vite
+📅 Calendar App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React-based Calendar and Productivity application with Firebase authentication and REST API integration.
 
-Currently, two official plugins are available:
+🚀 Live Demo
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+https://your-vercel-app.vercel.app
 
-## React Compiler
+🧰 Tech Stack
+React (Vite)
+Context API
+Axios
+Firebase Authentication
+REST API
+⚙️ Setup Instructions
+1. Clone Repository
+git clone https://github.com/your-username/calendar-app.git
+cd calendar-app
+2. Install Dependencies
+npm install
+3. Environment Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Create a .env file in the root folder:
 
-## Expanding the ESLint configuration
+VITE_API_BASE_URL=https://calendarapi.amzeno.com
+4. Run Project (Development)
+npm run dev
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Open:
+
+http://localhost:5173
+5. Build for Production
+npm run build
+6. Preview Build
+npm run preview
+🔗 API
+
+https://calendarapi.amzeno.com/docs#/
+
+🔐 Firebase Requirement
+
+Add deployed domain in Firebase Authentication → Authorized Domains:
+
+localhost
+your-vercel-app.vercel.app
+🚀 Deployment
+Build using npm run build
+Deploy using Vercel or Netlify
+👨‍💻 Author
+
+Naresh Krishna
