@@ -1,31 +1,43 @@
 import api from "./axios";
+import {
+  getBackendUserId,
+  extractUserIdFromData,
+  cacheBackendUserId,
+} from "./userApi";
 
-// GET /events/
 export const getEvents = async (params = {}) => {
   const res = await api.get("/events/", { params });
-  return res.data;
+  const data = res.data;
+  if (!getBackendUserId()) {
+    const id = extractUserIdFromData(Array.isArray(data) ? data : []);
+    if (id) cacheBackendUserId(id);
+  }
+  return data;
 };
 
-// GET /events/:id
-export const getEvent = async (id) => {
-  const res = await api.get(`/events/${id}`);
-  return res.data;
-};
+export const getEvent = async (id) => (await api.get(`/events/${id}`)).data;
 
-// POST /events/
 export const createEvent = async (data) => {
-  const res = await api.post("/events/", data);
+  const userId = getBackendUserId();
+  const res = await api.post("/events/", {
+    ...data,
+    ...(userId
+      ? { created_by_user_id: userId, organizer_user_id: userId }
+      : {}),
+  });
   return res.data;
 };
 
-// PUT /events/:id
 export const updateEvent = async (id, data) => {
-  const res = await api.put(`/events/${id}`, data);
+  const userId = getBackendUserId();
+  const res = await api.put(`/events/${id}`, {
+    ...data,
+    ...(userId
+      ? { created_by_user_id: userId, organizer_user_id: userId }
+      : {}),
+  });
   return res.data;
 };
 
-// DELETE /events/:id
-export const deleteEvent = async (id) => {
-  const res = await api.delete(`/events/${id}`);
-  return res.data;
-};
+export const deleteEvent = async (id) =>
+  (await api.delete(`/events/${id}`)).data;

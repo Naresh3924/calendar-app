@@ -7,6 +7,7 @@ import MiniCalendar from "../components/MiniCalendar";
 import { getTasks } from "../api/taskApi";
 import { getEvents } from "../api/eventApi";
 import { getGoals } from "../api/goalApi";
+import { cacheBackendUserId, getBackendUserId } from "../api/userApi";
 import "../styles/dashboard.css";
 
 const STRIPE_COLORS = [
@@ -33,6 +34,32 @@ function fmtEventTime(s) {
   return `${d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })} · ${time}`;
 }
 
+// Scan any array of objects and find a UUID-formatted user id
+function extractUUID(items) {
+  const fields = [
+    "created_by_user_id",
+    "user_id",
+    "organizer_user_id",
+    "owner_id",
+    "assigned_to",
+    "created_by",
+  ];
+  for (const item of items || []) {
+    for (const field of fields) {
+      const val = item?.[field];
+      if (
+        val &&
+        typeof val === "string" &&
+        val.includes("-") &&
+        val.length > 30
+      ) {
+        return val;
+      }
+    }
+  }
+  return null;
+}
+
 export default function Dashboard() {
   const { user } = useAuth();
   const [tasks, setTasks] = useState([]);
@@ -54,9 +81,36 @@ export default function Dashboard() {
         getEvents(),
         getGoals(),
       ]);
-      setTasks(t || []);
-      setEvents(e || []);
-      setGoals(g || []);
+      const taskList = t || [];
+      const eventList = e || [];
+      const goalList = g || [];
+
+      setTasks(taskList);
+      setEvents(eventList);
+      setGoals(goalList);
+
+      // Auto-extract and cache backend UUID from any returned data
+      if (!getBackendUserId()) {
+        const uuid =
+          extractUUID(taskList) ||
+          extractUUID(eventList) ||
+          extractUUID(goalList);
+        if (uuid) {
+          cacheBackendUserId(uuid);
+          console.log("✅ Backend UUID cached from data:", uuid);
+        } else {
+          // Log all fields of first task so we can see field names
+          if (taskList.length > 0) {
+            console.log("Task fields available:", JSON.stringify(taskList[0]));
+          }
+          if (eventList.length > 0) {
+            console.log(
+              "Event fields available:",
+              JSON.stringify(eventList[0]),
+            );
+          }
+        }
+      }
     } catch (err) {
       setError("Failed to load dashboard data.");
     } finally {
@@ -144,7 +198,7 @@ export default function Dashboard() {
                     <line x1="3" y1="10" x2="21" y2="10" />
                   </svg>
                 </div>
-                <span className="stat-chip chip-white">&#8593; +12%</span>
+                <span className="stat-chip chip-white">↑ +12%</span>
               </div>
               <div className="stat-number">{todayEvts.length}</div>
               <div className="stat-desc">Today's Events</div>
@@ -163,7 +217,7 @@ export default function Dashboard() {
                     <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
                   </svg>
                 </div>
-                <span className="stat-chip chip-red">&#8595; -5%</span>
+                <span className="stat-chip chip-red">↓ -5%</span>
               </div>
               <div className="stat-number">{pending.length}</div>
               <div className="stat-desc">Pending Tasks</div>
@@ -183,7 +237,7 @@ export default function Dashboard() {
                     <circle cx="12" cy="12" r="2" />
                   </svg>
                 </div>
-                <span className="stat-chip chip-green">&#8593; +3</span>
+                <span className="stat-chip chip-green">↑ +3</span>
               </div>
               <div className="stat-number">{activeGoals.length}</div>
               <div className="stat-desc">Active Goals</div>

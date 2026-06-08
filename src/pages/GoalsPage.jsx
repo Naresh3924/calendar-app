@@ -14,6 +14,8 @@ function GoalModal({ goal, onClose, onSave, onDelete }) {
     current_value: goal?.current_value || goal?.current || 0,
     frequency: goal?.frequency || "monthly",
     is_active: goal?.is_active !== false,
+    start_date: goal?.start_date || new Date().toISOString().split("T")[0],
+    end_date: goal?.end_date || "",
   });
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -78,6 +80,24 @@ function GoalModal({ goal, onClose, onSave, onDelete }) {
                 </option>
               ))}
             </select>
+          </div>
+          <div className="mrow">
+            <div className="mfield">
+              <label>Start Date *</label>
+              <input
+                type="date"
+                value={form.start_date}
+                onChange={(e) => set("start_date", e.target.value)}
+              />
+            </div>
+            <div className="mfield">
+              <label>End Date</label>
+              <input
+                type="date"
+                value={form.end_date}
+                onChange={(e) => set("end_date", e.target.value)}
+              />
+            </div>
           </div>
           <label className="check-row">
             <input
